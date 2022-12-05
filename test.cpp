@@ -1,19 +1,34 @@
 #include "test.h"
-#include <string>
-TEST_F(TestMain, sampleTests) {
-  ASSERT_EQ(4, solve("acb..bab.c.*.ab.ba.+.+*a.", "cbaa"));
-  ASSERT_EQ(2, solve("ab+c.aba.*.bac.+.+*", "babc"));
-  ASSERT_EQ(0, solve("1", "abba"));
+
+TEST_F(TestMain, symbolTests) {
+    Symbol c('A');
+    Symbol c2('b');
+    Symbol c3("A");
+    std::string empty;
+    Symbol creature(empty);
+    ASSERT_EQ(true, creature.isEmpty());
+    creature.setRepresentation("A");
+    creature.setTerminal( true);
+    ASSERT_EQ(false, creature.isEmpty());
+
+    ASSERT_EQ("A", c.getRepresentation());
+    ASSERT_EQ(false, c == c2);
+    ASSERT_EQ(true, c3 == c);
+    ASSERT_EQ(true, c.isTerminal());
+    ASSERT_EQ(false, c2.isTerminal());
+    ASSERT_EQ(true, c == creature);
+
+    testing::internal::CaptureStdout();
+    std::cout << c << c2;
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_EQ("Ab", output);
 }
 
-TEST_F(TestMain, testPlus) {
-  ASSERT_EQ(1, solve("ab+", "aaaa"));
-  ASSERT_EQ(1, solve("ab+", "bbbb"));
-  ASSERT_EQ(4, solve("abab...ab.+", "ababababab"));
-  ASSERT_EQ(2, solve("ab.ba.+", "bcacba"));
-}
-
-TEST_F(TestMain, testDot) {
- ASSERT_EQ(0, solve("abba...", "ccccc"));
- ASSERT_EQ(6, solve("abcabc.....", "aaaaaaaabcabc"));
+TEST_F(TestMain, ruleTests) {
+    Rule rule1("S   ->   aSb");
+    Rule rule2("S aSb");
+    Rule rule3("S ");
+    Rule rule4("S->A1");
+    ASSERT_EQ(true, rule1 == rule2);
+    
 }
