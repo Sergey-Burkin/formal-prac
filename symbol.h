@@ -10,8 +10,9 @@ public:
 	Symbol(char c) : Representation(1, c), terminal(isupper(c)) {}
 	Symbol(const std::string& name) : Representation(name), terminal(name.size() > 0 && isupper(name[0])) {}
 	Symbol& operator=(const Symbol& other) = default;
-	bool operator==(const Symbol& other);
-	bool operator!=(const Symbol& other);
+	bool operator==(const Symbol& other) const ;
+	bool operator!=(const Symbol& other) const;
+	bool operator<(const Symbol& other) const;
 	std::string getRepresentation() const;
 	void setRepresentation(const std::string& name);
 	bool isTerminal() const ;

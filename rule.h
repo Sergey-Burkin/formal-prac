@@ -12,7 +12,8 @@ public:
 	Rule(const std::string& rawString);
 	void pushBack(const Symbol& symbol, bool toLeft);
 	bool isEps() const;
-	bool operator==(const Rule& other);
-
+	bool operator==(const Rule& other) const;
+	bool operator<(const Rule&other) const;
 	friend std::ostream& operator<<(std::ostream& out, const Rule& rule);
+	friend struct Grammar;
 };

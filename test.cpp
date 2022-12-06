@@ -29,6 +29,59 @@ TEST_F(TestMain, ruleTests) {
     Rule rule2("S aSb");
     Rule rule3("S ");
     Rule rule4("S->A1");
+    Rule rule5("S A");
+    ASSERT_EQ(true, rule3 < rule1);
+    ASSERT_EQ(false, rule1 < rule2);
+    ASSERT_EQ(true, rule5 < rule4);
     ASSERT_EQ(true, rule1 == rule2);
-    
+    ASSERT_EQ(false, rule1 == rule3);
+    ASSERT_EQ(true, rule3 == rule3);
+    ASSERT_EQ(false, rule4 == rule5);
+    ASSERT_EQ(false, rule1.isEps());
+    ASSERT_EQ(true, rule3.isEps());
+
+    testing::internal::CaptureStdout();
+    std::cout << rule1;
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_EQ("S -> aSb", output);
+}
+
+TEST_F(TestGrammar, basicTests) {
+    Grammar g;
+    g.addRule(Rule("S -> SS"));
+    g.addRule("S -> a");
+    g.addRule("B -> b");
+    g.addRule("X -> Y");
+    testing::internal::CaptureStdout();
+
+    g.print();
+    std::string output = testing::internal::GetCapturedStdout();
+
+    ASSERT_EQ("B -> b\nS -> SS\nS -> a\nX -> Y\n", output);
+
+}
+
+TEST_F(TestGrammar, chomskyTest1) {
+    Grammar g;
+    g.addRule("S -> S");
+    g.addRule("S -> aSb");
+    g.addRule("X -> y");
+    g.removeMixedRules();
+    testing::internal::CaptureStdout();
+    g.print(" ");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_EQ("S -> S S -> TERM_aSTERM_b TERM_a -> a TERM_b -> b X -> y ", output);
+}
+
+TEST_F(TestGrammar, chomskyTest2) {
+    Grammar g;
+    g.addRule("S -> S");
+    g.addRule("S -> SS");
+    g.addRule("S -> ABCDEFG");
+    g.addRule("S-> XYZ");
+    g.removeLongRules();
+    testing::internal::CaptureStdout();
+    g.print(" ");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_EQ("LONG_0 -> BLONG_1 LONG_1 -> CLONG_2 LONG_2 -> DLONG_3 LONG_3 -> ELONG_4 LONG_4 -> FG LONG_5 -> YZ S -> ALONG_0 S -> S S -> SS S -> XLONG_5 ", output);
 }

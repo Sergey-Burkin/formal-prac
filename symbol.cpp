@@ -17,9 +17,13 @@ void Symbol::pushBack(char c) {Representation.push_back(c);}
 
 bool Symbol::isEmpty() const {return Representation.empty();}
 
-bool Symbol::operator==(const Symbol& other) {
+bool Symbol::operator==(const Symbol& other) const {
 	return Representation == other.Representation && terminal == other.terminal;
 }
-bool Symbol::operator!=(const Symbol& other) {
+bool Symbol::operator!=(const Symbol& other) const {
 	return !(*this == other);
+}
+
+bool Symbol::operator<(const Symbol& other) const {
+	return Representation < other.Representation;
 }

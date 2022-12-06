@@ -5,3 +5,6 @@
 
 class TestMain : public ::testing::Test {
 };
+
+class TestGrammar : public ::testing::Test{
+};

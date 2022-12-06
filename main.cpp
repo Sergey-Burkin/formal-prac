@@ -11,7 +11,13 @@ int main () {
     Symbol c3('A');
     Rule rule("S   -> a32Sb;;;$");
     Rule rule2("S ->");
-    std::cout << rule << '\n' << rule2 << '\n';
+    Grammar g;
+    g.addRule(rule);
+    g.addRule(rule2);
+    g.addRule(std::string("B -> A"));
+    g.addRule("B -> abcderfgg");
+    g.removeMixedRules();
+    g.print();
     int n;
     std::cin >> n;
     for (int i = 0; i < n; ++i) {

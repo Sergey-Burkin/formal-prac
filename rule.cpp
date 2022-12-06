@@ -46,7 +46,7 @@ bool Rule::isEps() const {
 	return true;
 }
 
-bool Rule::operator==(const Rule& other) {
+bool Rule::operator==(const Rule& other) const {
 	if (isEps() && other.isEps()) {
 		return true;
 	}
@@ -60,6 +60,24 @@ bool Rule::operator==(const Rule& other) {
 		}
 	}
 	return true;
+}
+
+bool Rule::operator<(const Rule& other) const{
+	if (left < other.left) {
+		return true;
+	}
+	if (other.left < left) {
+		return false;
+	}
+	for (int i = 0; i < std::min(right.size(), other.right.size()); ++i) {
+		if (right[i] < other.right[i]) {
+			return true;
+		} 
+		if (other.right[i] < right[i]) {
+			return false;
+		}
+	}
+	return right.size() < other.right.size();
 }
 
 std::ostream& operator<<(std::ostream& out, const Rule& rule) {
