@@ -97,10 +97,71 @@ void Grammar::removeLongRules() {
 	} 
 }
 
+void Grammar::removeEpsilonRules() {
+	std::set<Symbol> epsilonSymbols;
+	for (auto it = rules.begin(); it != rules.end(); ++it) {
+		if (it->isEpsilon()) {
+			epsilonSymbols.insert(it->left);
+		}
+	}
+	for (auto it = rules.begin(); it != rules.end(); ++it) {
+		bool isCurrentRuleEpsilon = true;
+		for (auto& symbol : it->right) {
+			if (epsilonSymbols.find(symbol) == epsilonSymbols.end()) {
+				isCurrentRuleEpsilon = false;
+				break;
+			}
+		}
+		if (isCurrentRuleEpsilon) {
+			if (epsilonSymbols.find(it->left) == epsilonSymbols.end()) {
+				epsilonSymbols.insert(it->left);
+				it = rules.begin();
+			}
+		}
+	}
+	for (auto it = rules.begin(); it!= rules.end(); ++it) {
+		if (it->right.size() <= 1) {
+			continue;
+		}
+		Symbol left = it->left;
+		Symbol right[2];
+		right[0] = it->right[0];
+		right[1] = it->right[1];
+		for (int i = 0; i < 2; ++i) {
+			if (epsilonSymbols.find(right[i]) != epsilonSymbols.end()) {
+				Rule newRule;
+				newRule.left = left;
+				newRule.right.push_back(right[(i + 1) % 2]);
+				rules.insert(newRule);
+			}
+		}
+	}
+	for (auto it = rules.begin(); it != rules.end();) {
+		if (it->isEpsilon()) {
+			rules.erase(it++);
+			continue;
+		}
+		++it;
+	} 
+	if (epsilonSymbols.find(start) != epsilonSymbols.end()) {
+		Symbol newSymbol = start;
+		newSymbol.setRepresentation(start.getRepresentation() + "_EPS");
+		rules.insert(Rule(newSymbol, start));
+		rules.insert(newSymbol); 
+		start = newSymbol;
+	}
+}
+
+void Grammar::removeUnitRules() {
+	
+}
+
 void Grammar::makeChomskyForm() { 
 	if (isInChomskyForm) {
 		return;
 	}
 	removeMixedRules();
 	removeLongRules();
+	removeEpsilonRules();
+
 }

@@ -13,6 +13,8 @@ public:
 	void print(const std::string& sep) const;
 	void removeMixedRules();
 	void removeLongRules();
+	void removeEpsilonRules();
+	void removeUnitRules();
 	void makeChomskyForm();
 	bool runCYK(const std::string& word);
 };

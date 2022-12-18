@@ -37,8 +37,8 @@ TEST_F(TestMain, ruleTests) {
     ASSERT_EQ(false, rule1 == rule3);
     ASSERT_EQ(true, rule3 == rule3);
     ASSERT_EQ(false, rule4 == rule5);
-    ASSERT_EQ(false, rule1.isEps());
-    ASSERT_EQ(true, rule3.isEps());
+    ASSERT_EQ(false, rule1.isEpsilon());
+    ASSERT_EQ(true, rule3.isEpsilon());
 
     testing::internal::CaptureStdout();
     std::cout << rule1;
@@ -84,4 +84,16 @@ TEST_F(TestGrammar, chomskyTest2) {
     g.print(" ");
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_EQ("LONG_0 -> BLONG_1 LONG_1 -> CLONG_2 LONG_2 -> DLONG_3 LONG_3 -> ELONG_4 LONG_4 -> FG LONG_5 -> YZ S -> ALONG_0 S -> S S -> SS S -> XLONG_5 ", output);
+}
+
+TEST_F(TestGrammar, chomskyTest3) {
+    Grammar g;
+    g.addRule("S -> ");
+    g.addRule("S -> XY");
+    g.addRule("X -> ");
+    g.addRule("Y -> a");
+    g.addRule("X -> b");
+    g.addRule("Y -> X");
+    g.removeEpsilonRules();
+    g.print(" ");
 }

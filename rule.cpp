@@ -34,7 +34,7 @@ Rule::Rule(const std::string& rawString) {
 	}
 }
 
-bool Rule::isEps() const {
+bool Rule::isEpsilon() const {
 	if (right.empty()) {
 		return true;
 	}
@@ -47,7 +47,7 @@ bool Rule::isEps() const {
 }
 
 bool Rule::operator==(const Rule& other) const {
-	if (isEps() && other.isEps()) {
+	if (isEpsilon() && other.isEpsilon()) {
 		return true;
 	}
 	if (left != other.left) {return false;}
@@ -82,7 +82,7 @@ bool Rule::operator<(const Rule& other) const{
 
 std::ostream& operator<<(std::ostream& out, const Rule& rule) {
 	out << rule.left << FORMAT;
-	if (rule.isEps()) {
+	if (rule.isEpsilon()) {
 		out << EPSILON;
 	}
 	for (auto& symbol : rule.right) {
