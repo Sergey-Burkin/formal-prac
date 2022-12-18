@@ -6,6 +6,7 @@ private:
 	std::vector<Symbol> right;
 	static const std::string FORMAT;
 	static const std::string EPSILON;
+	bool inAlphabet(char c);
 public:
 	Rule() = default;
 	Rule(const Symbol& symbol) : left(symbol) {}
@@ -13,6 +14,7 @@ public:
 	Rule(const std::string& rawString);
 	void pushBack(const Symbol& symbol, bool toLeft);
 	bool isEpsilon() const;
+	bool isUnit() const;
 	bool operator==(const Rule& other) const;
 	bool operator<(const Rule&other) const;
 	friend std::ostream& operator<<(std::ostream& out, const Rule& rule);

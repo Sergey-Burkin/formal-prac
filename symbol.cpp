@@ -13,8 +13,6 @@ bool Symbol::isTerminal() const {return terminal;};
 
 void Symbol::setTerminal(bool value) {terminal = value;};
 
-void Symbol::pushBack(char c) {Representation.push_back(c);}
-
 bool Symbol::isEmpty() const {return Representation.empty();}
 
 bool Symbol::operator==(const Symbol& other) const {

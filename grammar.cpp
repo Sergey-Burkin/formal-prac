@@ -1,5 +1,6 @@
 #include "grammar.h"
 #include <iostream>
+
 void Grammar::addRule(const Rule& rule) {
 	rules.insert(rule);
 	isInChomskyForm = false;
@@ -152,7 +153,60 @@ void Grammar::removeEpsilonRules() {
 	}
 }
 
+void Grammar::dfsUnit(const Symbol current, const std::map<Symbol, std::vector<Symbol>>& graph,
+		std::map<Symbol, bool>& visited) {
+	if (visited[current]) {
+		return;
+	}
+	visited[current] = true;
+	for ( auto symbol : graph.at(current)) {
+		dfsUnit(symbol, graph, visited);
+	}
+}
+
 void Grammar::removeUnitRules() {
+	std::map<Symbol, std::vector<Symbol>> graph;
+	std::map<Symbol, bool> visited;
+	std::map<Symbol, std::vector<std::set<Rule>::iterator>> nonUnitRules;
+	std::set<Rule> newRules;
+
+	for (auto it = rules.begin(); it != rules.end(); ++it) {
+		if (it->isUnit()) {
+			graph[it->left].push_back(it->right.front());
+			graph[it->right.front()];
+			visited[it->left] = false;
+			visited[it->right.front()] = false;
+		} else {
+			nonUnitRules[it->left].push_back(it);
+		}
+	}
+	for (auto& pair : graph) {
+		for (auto& pairBool : visited) {
+			pairBool.second = false;
+		}
+		Symbol current = pair.first;
+		dfsUnit(current, graph, visited);
+		for (auto& pairBool : visited) {
+			if (pairBool.second == false) {
+				continue;
+			}
+			Symbol otherSymbol = pairBool.first;
+			if (otherSymbol == current) {continue;}
+			for (auto iterator : nonUnitRules[otherSymbol]) {
+				Rule newRule = *iterator;
+				newRule.left = current;
+				newRules.insert(newRule);
+			}
+		}
+	}
+	for (auto it = rules.begin(); it != rules.end();) {
+		if (it->isUnit()) {
+			rules.erase(it++);
+			continue;
+		}
+		++it;
+	} 
+	rules.insert(newRules.begin(), newRules.end());
 	
 }
 
@@ -163,5 +217,48 @@ void Grammar::makeChomskyForm() {
 	removeMixedRules();
 	removeLongRules();
 	removeEpsilonRules();
+	removeUnitRules();
+	isInChomskyForm = true;
 
+}
+
+bool Grammar::runCYK(const std::string& word) {
+	makeChomskyForm();
+	int n = word.size();
+	std::vector<std::vector<bool>> zero(n + 1, std::vector<bool>(n + 1, false));
+	std::map<Symbol, std::vector<std::vector<bool>>> dp;
+	for (auto& rule: rules) {
+		if (dp.find(rule.left) == dp.end() ) {
+			dp[rule.left] = zero;
+		}
+		if (!rule.right.empty() && !rule.right.front().isTerminal()) {
+			for (int i = 0; i < n; ++i) {
+				if (Symbol(word[i]) == rule.right.front()){
+					dp[rule.left][i][i + 1] = true;
+				}
+			}
+		} else {
+			for (int i = 0; i <= n; ++i) {
+				dp[rule.left][i][i] = true;
+			}
+		}
+	}
+	for (int length = 2; length <= n; ++length) {
+		for (auto& rule : rules) { //A -> BC
+			if (rule.right.size() != 2) {
+				continue;
+			}
+			Symbol a = rule.left;
+			Symbol b = rule.right[0];
+			Symbol c = rule.right[1];
+			for (int i = 0; i + length <= n; ++ i) {
+				for (int k = i; k <= i + length; ++ k) {
+					if (dp[b][i][k] && dp[c][k][i + length]) {
+						dp[a][i][i + length] = true;
+					}
+				}
+			}
+		}
+	}
+	return dp[start][0][n];
 }

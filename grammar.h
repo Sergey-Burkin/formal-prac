@@ -1,10 +1,13 @@
 #include "rule.h"
 #include <set>
+#include <map>
 struct Grammar {
 private:
 	std::set<Rule> rules;
 	bool isInChomskyForm = false;
 	Symbol start = 'S';
+	void dfsUnit(const Symbol current, const std::map<Symbol, std::vector<Symbol>>& graph,
+		std::map<Symbol, bool>& visited);
 public:
 	void addRule(const Rule& rule);
 	void addRule(const char* rule);

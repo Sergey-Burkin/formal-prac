@@ -30,6 +30,7 @@ TEST_F(TestMain, ruleTests) {
     Rule rule3("S ");
     Rule rule4("S->A1");
     Rule rule5("S A");
+    Rule rule6("S B");
     ASSERT_EQ(true, rule3 < rule1);
     ASSERT_EQ(false, rule1 < rule2);
     ASSERT_EQ(true, rule5 < rule4);
@@ -37,6 +38,7 @@ TEST_F(TestMain, ruleTests) {
     ASSERT_EQ(false, rule1 == rule3);
     ASSERT_EQ(true, rule3 == rule3);
     ASSERT_EQ(false, rule4 == rule5);
+    ASSERT_EQ(false, rule6 == rule5);
     ASSERT_EQ(false, rule1.isEpsilon());
     ASSERT_EQ(true, rule3.isEpsilon());
 
@@ -95,5 +97,57 @@ TEST_F(TestGrammar, chomskyTest3) {
     g.addRule("X -> b");
     g.addRule("Y -> X");
     g.removeEpsilonRules();
+    testing::internal::CaptureStdout();
     g.print(" ");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_EQ("S -> X S -> XY S -> Y S_EPS -> ε S_EPS -> S X -> b Y -> X Y -> a ", output);
+}
+
+TEST_F(TestGrammar, chomskyTest4) {
+    Grammar g;
+    g.addRule("S -> A");
+    g.addRule("A -> B");
+    g.addRule("B -> S");
+    g.addRule("A -> aa");
+    g.addRule("A -> a");
+    g.addRule("B -> b");
+    g.addRule("S -> AA");
+    g.removeUnitRules();
+    testing::internal::CaptureStdout();
+    g.print(" ");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_EQ("A -> AA A -> a A -> aa A -> b B -> AA B -> a B -> aa B -> b S -> AA S -> a S -> aa S -> b ", output);
+
+}
+
+TEST_F(TestGrammar, CYKTest1) {
+    Grammar g;
+    g.addRule("S -> SS");
+    g.addRule("S -> (S)");
+    g.addRule("S -> ");
+    ASSERT_EQ(g.runCYK("()"), true);
+    ASSERT_EQ(g.runCYK(")("), false);
+    ASSERT_EQ(g.runCYK(""), true);
+    ASSERT_EQ(g.runCYK("(())()"), true);
+    ASSERT_EQ(g.runCYK("("), false);
+    ASSERT_EQ(g.runCYK(")"), false);
+}
+
+TEST_F(TestGrammar, CYKTest2) {
+    Grammar g;
+    g.addRule("S -> AB");
+    g.addRule("A -> AA");
+    g.addRule("A -> a");
+    g.addRule("A ->");
+    g.addRule("B -> BB");
+    g.addRule("B -> b");
+    g.addRule("B ->");
+
+    ASSERT_EQ(g.runCYK("aabb"), true);
+    ASSERT_EQ(g.runCYK("abba"), false);
+    ASSERT_EQ(g.runCYK(""), true);
+    ASSERT_EQ(g.runCYK("a"), true);
+    ASSERT_EQ(g.runCYK("b"), true);
+    ASSERT_EQ(g.runCYK("ba"), false);
+    ASSERT_EQ(g.runCYK("aaaaaaaaaabbbbb"), true);
 }

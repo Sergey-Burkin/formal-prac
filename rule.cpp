@@ -11,22 +11,22 @@ void Rule::pushBack(const Symbol& symbol, bool toLeft) {
 	}
 }
 
+bool Rule::inAlphabet(char c) {
+	return isalpha(c) || isdigit(c) || c == '(' || c == ')';
+}
+
 Rule::Rule(const std::string& rawString) {
 	bool leftSetted = false;
 	Symbol current;
 	for (char c : rawString) {
-		if (!(isalpha(c) || isdigit(c))) {
+		if (!inAlphabet(c)) {
 			continue;
 		}
-		if (isalpha(c)) {
-			if (!current.isEmpty()) {
-				pushBack(current, !leftSetted);
-				leftSetted = true;
-			}
-			current = Symbol(c);
-		} else {
-			current.pushBack(c);
+		if (!current.isEmpty()) {
+			pushBack(current, !leftSetted);
+			leftSetted = true;
 		}
+		current = Symbol(c);
 	}
 
 	if (!current.isEmpty()) {
@@ -44,6 +44,10 @@ bool Rule::isEpsilon() const {
 		}
 	}
 	return true;
+}
+
+bool Rule::isUnit() const {
+	return right.size() == 1 && right.front().isTerminal();
 }
 
 bool Rule::operator==(const Rule& other) const {

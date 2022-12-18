@@ -17,7 +17,6 @@ public:
 	void setRepresentation(const std::string& name);
 	bool isTerminal() const ;
 	void setTerminal(bool value);
-	void pushBack(char c);
 	bool isEmpty() const;
     friend std::ostream& operator<<(std::ostream& out, const Symbol& symbol);
 };
